@@ -27,7 +27,7 @@ typedef struct Context
     size_t n;
     FILE *out;
     int32_t t;
-    Action_t acion;
+    Action_t action;
     bool interactive;
 } Context_t;
 
