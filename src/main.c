@@ -1,5 +1,8 @@
 #include "main.h"
 
+#include <errno.h>
+#include <logger.h>
+#include <math.h>
 #include <netManager.h>
 
 bool checkAction(const char *s, Action_t *action)
@@ -28,7 +31,7 @@ bool checkFile(const char *s, FILE **out)
     *out = fopen(s, "w");
     if (!*out)
     {
-        E_Print("fopen: %s\n", strerror(errno));
+        logE(stderr, "fopen: %s\n", strerror(errno));
         return false;
     }
     return true;
@@ -87,7 +90,7 @@ int parseArg(const int argc, char *argv[], Context_t *context)
                     return EXIT_FAILURE;
                 break;
             default:
-                E_Print("-%c is not a valid argument!\n", opt);
+                logE(stderr, "-%c is not a valid argument!\n", opt);
                 return EXIT_FAILURE;
         }
         opt = getopt(argc, argv, "n:o:it:");
@@ -120,12 +123,12 @@ int sendTest(const Context_t *context)
 
     for (size_t i = 0; i < context->n; ++i)
     {
-        fprintf(context->out, "Sending packet number %ld of %ld...", i + 1, context->n);
+        logD(context->out, "Sending packet number %ld of %ld...", i + 1, context->n);
         addPacket(Beacon, &i, sizeof(size_t));
         while (!isQueueEmpty())
         {
         }
-        fprintf(context->out, "OK!\n");
+        logD(context->out, "OK!\n");
         mySleep(context->t * 1000);
     }
     stopPcap();
@@ -138,28 +141,38 @@ int recvTest(const Context_t *context)
     if (loopPcap())
         return EXIT_FAILURE;
 
-    fprintf(context->out, "Going to sleep for %d seconds\n", context->t);
+    if (context->interactive)
+    {
+        logD(context->out, "Waiting for user to close...\n");
+        getchar();
+        logD(context->out, "Closing...\n");
+        stopPcap();
+        logD(context->out, "OK!\n");
+        return EXIT_SUCCESS;
+    }
+
+    logD(context->out, "Going to sleep for %d seconds\n", context->t);
     mySleep(context->t);
-    fprintf(context->out, "Waked up! Closing pcap...");
+    logD(context->out, "Waked up! Closing pcap...");
     stopPcap();
-    fprintf(context->out, "OK!\n");
+    logD(context->out, "OK!\n");
     return EXIT_SUCCESS;
 }
 
 int main(const int argc, char *argv[])
 {
 #ifdef Debug
-    D_Print("Launched in Debug Mode!\n");
+    logD(stdout, "Launched in Debug Mode!\n");
 #endif
 
     Context_t context;
     if (parseArg(argc, argv, &context))
     {
-        E_Print("Usage: ProSafe {send|recv} [-n <number_of_packets>] [-o <file_out>] [-i] [-t <millisecond_to_wait>]\n");
+        logE(stderr, "Usage: ProSafe {send|recv} [-n <number_of_packets>] [-o <file_out>] [-i] [-t <millisecond_to_wait>]\n");
         return EXIT_FAILURE;
     }
 
-    fprintf(context.out, BOLD ITALIC GREEN "------Parameters------\n" RESET BLUE "Action:" RESET "      %s\n" BLUE "N packets:" RESET "   %ld\n" BLUE "Output file:" RESET " %s\n" BLUE "Interactive:" RESET " %s\n" BLUE "Wait time: " RESET "  %d" GREEN "\n----------------------\n" RESET, context.action == SEND ? "Send" : "Receive", context.n, context.out == stdout ? "stdout" : "file", context.interactive ? "yes" : "no", context.t);
+    logD(context.out, BOLD ITALIC GREEN "\n------Parameters------\n" RESET BLUE "Action:" RESET "      %s\n" BLUE "N packets:" RESET "   %ld\n" BLUE "Output file:" RESET " %s\n" BLUE "Interactive:" RESET " %s\n" BLUE "Wait time: " RESET "  %d" GREEN "\n----------------------\n" RESET, context.action == SEND ? "Send" : "Receive", context.n, context.out == stdout ? "stdout" : "file", context.interactive ? "yes" : "no", context.t);
 
 
     if (initPcap() || createHandle("wlan1") || activateHandle())

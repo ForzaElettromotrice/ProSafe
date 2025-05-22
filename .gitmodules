@@ -1,3 +1,6 @@
 [submodule "lib/BNet"]
 	path = lib/BNet
 	url = https://github.com/ForzaElettromotrice/BNet
+[submodule "lib/CUtils"]
+	path = lib/CUtils
+	url = https://github.com/ForzaElettromotrice/CUtils

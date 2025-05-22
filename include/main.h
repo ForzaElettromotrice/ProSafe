@@ -5,15 +5,8 @@
 #pragma once
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-
-
-#include "logger.h"
 
 
 typedef enum Action
