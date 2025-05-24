@@ -45,19 +45,6 @@ bool checkT(const char *s, int32_t *t)
 
     return *s != '\0' && *end == '\0';
 }
-void mySleep(const int usec)
-{
-    struct timespec start;
-    struct timespec end;
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    for (;;)
-    {
-        clock_gettime(CLOCK_MONOTONIC, &end);
-        const long elapsed_nsec = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
-        if (elapsed_nsec >= usec * 1000)
-            return;
-    }
-}
 
 int parseArg(const int argc, char *argv[], Context_t *context)
 {
