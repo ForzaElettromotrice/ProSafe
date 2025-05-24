@@ -3,3 +3,4 @@ build
 .idea
 bin
 lib/BNet/lib
+lib/CUtils/lib
