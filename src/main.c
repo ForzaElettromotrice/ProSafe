@@ -151,7 +151,7 @@ int recvTest(const Context_t *context)
         return EXIT_SUCCESS;
     }
 
-    logD(context->out, "Going to sleep for %d seconds\n", context->t);
+    logD(context->out, "Going to sleep for %d microseconds\n", context->t);
     mySleep(context->t);
     logD(context->out, "Waked up! Closing pcap...");
     stopPcap();
