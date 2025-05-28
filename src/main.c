@@ -55,6 +55,7 @@ int parseArg(const int argc, char *argv[], Context_t *context)
     context->out = stdout;
     context->interactive = false;
     context->t = context->action == SEND ? 100 : 6000;
+    context->total = 0;
 
     int opt = getopt(argc, argv, "n:o:it:");
     while (opt != -1)
@@ -92,9 +93,8 @@ void freeContext(const Context_t *context)
 
 void callback(PacketType_t packetType, size_t size, u_char *data, void *userData)
 {
-    const Context_t *context = userData;
+    Context_t *context = userData;
     uint8_t OUI[3];
-    uint8_t proto = data[3];
     memcpy(OUI, data, 3);
     data += 4;
 
@@ -105,7 +105,8 @@ void callback(PacketType_t packetType, size_t size, u_char *data, void *userData
     }
     size_t pn;
     memcpy(&pn, data, sizeof(size_t));
-    fprintf(context->out, "Received packet number %ld of %ld\n", pn, context->n);
+    logD(context->out, "Received packet number %ld of %ld\n", pn, context->n);
+    context->total++;
 }
 
 
@@ -141,6 +142,7 @@ int recvTest(const Context_t *context)
         logD(context->out, "Closing...\n");
         stopPcap();
         logD(context->out, "OK!\n");
+        logD(context->out, "Total packet received: %ld\n", context->total);
         return EXIT_SUCCESS;
     }
 
@@ -149,6 +151,7 @@ int recvTest(const Context_t *context)
     logD(context->out, "Waked up! Closing pcap...");
     stopPcap();
     logD(context->out, "OK!\n");
+    logD(context->out, "Total packet received: %ld\n", context->total);
     return EXIT_SUCCESS;
 }
 

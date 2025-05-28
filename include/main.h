@@ -22,5 +22,6 @@ typedef struct Context
     int32_t t;
     Action_t action;
     bool interactive;
+    size_t total;
 } Context_t;
 
