@@ -98,8 +98,9 @@ void callback(PacketType_t packetType, size_t size, u_char *data, void *userData
         logE(context->out, "PT = %d, s = %d\nReceived something that is not what we excpected!\n", packetType, size);
         return;
     }
-
-    fprintf(context->out, "Received packet number %ld of %ld\n", *(size_t *) data, context->n);
+    size_t pn;
+    memcpy(&pn, data, sizeof(size_t));
+    fprintf(context->out, "Received packet number %ld of %ld\n", pn, context->n);
 }
 
 
