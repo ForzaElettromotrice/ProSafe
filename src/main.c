@@ -151,7 +151,7 @@ int recvTest(const Context_t *context)
     logD(context->out, "Waked up! Closing pcap...");
     stopPcap();
     logD(context->out, "OK!\n");
-    logD(context->out, "Total packet received: %ld\n", context->total);
+    logD(context->out, "Total packet received: %ld of %ld\n", context->total, context->n);
     return EXIT_SUCCESS;
 }
 
