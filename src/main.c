@@ -93,6 +93,11 @@ void freeContext(const Context_t *context)
 void callback(PacketType_t packetType, size_t size, u_char *data, void *userData)
 {
     const Context_t *context = userData;
+    uint8_t OUI[3];
+    uint8_t proto = data[3];
+    memcpy(OUI, data, 3);
+    data += 4;
+
     if (packetType != Beacon)
     {
         logE(context->out, "PT = %d, s = %d\nReceived something that is not what we excpected!\n", packetType, size);
